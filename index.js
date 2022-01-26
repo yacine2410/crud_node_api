@@ -11,7 +11,7 @@ var mysqlConnection = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "",
-  database: "employeeDB",
+  database: "employeeDB1",
   port: "3306",
   multipleStatements: true,
 });
@@ -93,34 +93,27 @@ app.delete("/employees/:id", methods.ensureToken, (req, res) => {
 app.post("/employees", (req, res) => {
   let emp = req.body;
   var sql =
-    "SET @EmpID = ?;SET @Name = ?;SET @EmpCode = ?;SET @Salary = ?; \
-    CALL EmployeeAddOrEdit(@EmpID,@Name,@EmpCode,@Salary);";
+    "INSERT INTO employee (EmpID, Name, EmpCode, Salary) VALUES ( ?,?,?,?)";
   mysqlConnection.query(
     sql,
     [emp.EmpID, emp.Name, emp.EmpCode, emp.Salary],
     (err, rows, fields) => {
-      if (!err)
-        rows.forEach((element) => {
-          if (element.constructor == Array)
-            res.send("Inserted employee id : " + element[0].EmpID);
-        });
+      if (!err) res.send("employee Inserted ");
       else console.log(err);
     }
   );
 });
 
 //Update an employee
-
 app.put("/employees", (req, res) => {
   let emp = req.body;
   var sql =
-    "SET @EmpID = ?;SET @Name = ?;SET @EmpCode = ?;SET @Salary = ?; \
-    CALL EmployeeAddOrEdit(@EmpID,@Name,@EmpCode,@Salary);";
+    "UPDATE employee SET Name = ?, EmpCode = ?, Salary =? WHERE EmpID = ?";
   mysqlConnection.query(
     sql,
-    [emp.EmpID, emp.Name, emp.EmpCode, emp.Salary],
+    [emp.Name, emp.EmpCode, emp.Salary, emp.EmpID],
     (err, rows, fields) => {
-      if (!err) res.send("Updated successfully");
+      if (!err) res.send("employee Updated ");
       else console.log(err);
     }
   );
