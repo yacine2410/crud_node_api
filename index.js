@@ -8,6 +8,8 @@
 const EMAIL_USER = "IT325project@gmail.com";
 const EMAIL_PASS = "IT325project@Yacine";
 
+const bcrypt = require('bcrypt');
+
 const mysql = require("mysql");
 const express = require("express");
 var methods = require("./methodTokens");
@@ -319,20 +321,24 @@ app.post('/set-password', (req, res) => {
 
 //employee log-in, token, edit personal information & notification email
 // login endpoint
+//employee log-in, token, edit personal information & notification email
+// login endpoint
 app.post('/login', (req, res) => {
   const email = req.body.email;
   const plainPassword = req.body.password;
 
   mysqlConnection.query(`SELECT EmpID, password FROM employee WHERE email = '${email}'`, (error, results) => {
     if (error) {
+      console.error(error);
       res.status(500).send(error);
     } else if (results.length > 0) {
       const hashedPassword = results[0].password;
+      console.log(`Comparing plain password: ${plainPassword} with hashed password: ${hashedPassword}`);
       bcrypt.compare(plainPassword, hashedPassword, function(err, passwordMatch) {
         if (passwordMatch) {
           const EmpID = results[0].EmpID;
           const token = jwt.sign({EmpID: EmpID}, 'secretkey', { expiresIn: '24h' });
-          
+          console.log(`Creating token: ${token} for EmpID: ${EmpID}`);
           // send notification email
           let transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -349,20 +355,25 @@ app.post('/login', (req, res) => {
           };
           transporter.sendMail(mailOptions, function(error, info){
             if (error) {
+              console.error(error);
               res.status(500).send(error);
             } else {
+              console.log(`Sending email to: ${email} with options: ${mailOptions}`);
               res.status(200).send({ auth: true, token: token });
             }
           });
         } else {
+          console.log(`Invalid email or password for email: ${email}`);
           res.status(401).send({ auth: false, message: 'Invalid email or password' });
         }
       });
     } else {
+      console.log(`Invalid email or password for email: ${email}`);
       res.status(401).send({ auth: false, message: 'Invalid email or password' });
     }
   });
 });
+
 
 // update endpoint
 app.put('/employee',verifyToken, (req, res) => {
