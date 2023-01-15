@@ -24,7 +24,7 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `employee`
+-- Table structure for table employee
 --
 
 CREATE TABLE `employee` (
@@ -60,9 +60,8 @@ CREATE TABLE departments (
 );
 
 -- Add foreign key to Departments table 
-ALTER TABLE departments
-ADD FOREIGN KEY (dept_head) REFERENCES employee(EmpID);
-
+ALTER TABLE `departments`
+ADD FOREIGN KEY (`dept_head`) REFERENCES `employee`(`EmpID`);
 --
 -- Dumping data for table `employee` and table `departments`
 --
@@ -78,7 +77,7 @@ INSERT INTO `employee` (`EmpID`, `FirstName`, `LastName`, `EmpCode`, `Salary`, `
 (17, 'Mark', 'Bell', 2135, 80000, 3, 'yacin.montacer@gmail.com', '+216 55 555 555', 'junior accountant', 'Accounting'),
 (18, 'Mark', 'Baum', 5468, 60000, 1, 'yacin.montacer@gmail.com', '+216 55 555 555', 'HR associate', 'HR'),
 (19, 'Matt', 'Wenning', 2356, 60000, 20, 'yacin.montacer@gmail.com', '+216 55 555 555', 'junior accountant', 'Accounting'),
-(20, 'Homer', 'Simpson', 5421, 300000, 25, 'yacin.montacer@gmail.com', '+216 55 555 555', 'junior engineer', 'IT');'
+(20, 'Homer', 'Simpson', 5421, 300000, 25, 'yacin.montacer@gmail.com', '+216 55 555 555', 'junior engineer', 'IT');
 
 
 INSERT INTO departments (dept_name, dept_head) VALUES
