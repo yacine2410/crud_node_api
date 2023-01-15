@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `employeeDB`
+-- Database: `employeeDB1`
 --
 
 -- --------------------------------------------------------
@@ -34,47 +34,70 @@ CREATE TABLE `employee` (
   `LastName` varchar(20) NOT NULL,
   -- employee name
   `EmpCode` int(20) NOT NULL,
-  --employee code
+  -- employee code
   `Salary` int(20) NOT NULL,
-  --employee salary
+  -- employee salary
   `DaysOff` int(20) NOT NULL,
-  --number of days off the employee has available
+  -- number of days off the employee has availableADD COLUMN 
+  `email` VARCHAR(255) NOT NULL,
+  -- email
+  `phone` VARCHAR(20) NOT NULL,
+  -- phone number
+  `job_title` VARCHAR(255) NOT NULL,
+  -- employee job title
+  `dept_name` VARCHAR(255) NOT NULL
+  -- department the employee works in
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Create a departments table
+CREATE TABLE departments (
+    `dept_id` INT AUTO_INCREMENT PRIMARY KEY,
+    -- department ID auto incrementing number
+    `dept_name` VARCHAR(255) NOT NULL,
+    -- Department name
+    `dept_head` int(20) NOT NULL
+    -- Employee ID department Head
+);
+
+-- Add foreign key to Departments table 
+ALTER TABLE departments
+ADD FOREIGN KEY (dept_head) REFERENCES employee(EmpID);
+
 --
--- Dumping data for table `employee`
+-- Dumping data for table `employee` and table `departments`
 --
 
-/* INSERT INTO `employee` (`EmpID`, `FirstName`, `LastName`, `EmpCode`, `Salary`, `DaysOff`) VALUES
-(10, 'Peter', 'Griffin', 7892, 500000, 12),
-(11, 'Johnny', 'Candito', 13, 40000, 10),
-(12, 'Ed', 'Coan', 89, 77000, 6),
-(13, 'Danielle', 'Melo', 2121, 88000, 5),
-(14, 'Amanda', 'Ann', 3232, 110000, 0),
-(15, 'Jaquin', 'Phoenix', 87564, 100000, 2),
-(16, 'John', 'Doe', 433512, 90000, 1),
-(17, 'Mark', 'Bell', 2135, 80000, 3),
-(18, 'Mark', 'Baum', 5468, 60000, 1),
-(19, 'Matt', 'Wenning', 2356, 60000, 20),
-(20, 'Homer', 'Simpson', 5421, 300000, 25); */
+INSERT INTO `employee` (`EmpID`, `FirstName`, `LastName`, `EmpCode`, `Salary`, `DaysOff`, `email`, `phone`, `job_title`, `dept_name`) VALUES
+(10, 'Peter', 'Griffin', 7892, 500000, 12, 'yacin.montacer@gmail.com', '+216 55 555 555', 'junior accountant', 'Accounting'),
+(11, 'Johnny', 'Candito', 13, 40000, 10, 'yacin.montacer@gmail.com', '+216 55 555 555', 'senior engineer', 'IT'),
+(12, 'Ed', 'Coan', 89, 77000, 6, 'yacin.montacer@gmail.com', '+216 55 555 555', 'manager', 'IT'),
+(13, 'Danielle', 'Melo', 2121, 88000, 5, 'yacin.montacer@gmail.com', '+216 55 555 555', 'manager', 'Accounting'),
+(14, 'Amanda', 'Ann', 3232, 110000, 0, 'yacin.montacer@gmail.com', '+216 55 555 555', 'manager', 'HR'),
+(15, 'Jaquin', 'Phoenix', 87564, 100000, 2, 'yacin.montacer@gmail.com', '+216 55 555 555', 'senior accountant', 'Accounting'),
+(16, 'John', 'Doe', 433512, 90000, 1, 'yacin.montacer@gmail.com', '+216 55 555 555', 'technician', 'IT'),
+(17, 'Mark', 'Bell', 2135, 80000, 3, 'yacin.montacer@gmail.com', '+216 55 555 555', 'junior accountant', 'Accounting'),
+(18, 'Mark', 'Baum', 5468, 60000, 1, 'yacin.montacer@gmail.com', '+216 55 555 555', 'HR associate', 'HR'),
+(19, 'Matt', 'Wenning', 2356, 60000, 20, 'yacin.montacer@gmail.com', '+216 55 555 555', 'junior accountant', 'Accounting'),
+(20, 'Homer', 'Simpson', 5421, 300000, 25, 'yacin.montacer@gmail.com', '+216 55 555 555', 'junior engineer', 'IT');'
+
+
+INSERT INTO departments (dept_name, dept_head) VALUES
+    ('IT', 12),
+    ('HR', 14),
+    ('Accounting', 13);
 
 --
 -- Indexes for dumped tables
 --
 
 --
--- Indexes for table `employee`
+-- Indexes for table 'employee`
 --
 ALTER TABLE `employee`
   ADD PRIMARY KEY (`EmpID`);
 COMMIT;
 
---Add columns to table employee 
-ALTER TABLE employee
-ADD COLUMN email VARCHAR(255) NOT NULL,
-ADD COLUMN phone VARCHAR(20) NOT NULL,
-ADD COLUMN job_title VARCHAR(255) NOT NULL,
-ADD COLUMN department VARCHAR(255) NOT NULL;
+
 
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
