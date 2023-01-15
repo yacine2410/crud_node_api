@@ -14,6 +14,8 @@ var methods = require("./methodTokens");
 var app = express();
 let jwt = require("jsonwebtoken");
 const nodemailer = require('nodemailer');
+var bodyParser = require('body-parser');
+app.use(bodyParser.json());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -170,14 +172,14 @@ app.get('/check-days-off', (req, res) => {
   const daysOff = req.body.daysOff;
 
   // Check if employee has enough days off available
-  connection.query(`SELECT DaysOff FROM employee WHERE EmpID = ${EmpID}`, (error, results) => {
+  mysqlConnection.query(`SELECT DaysOff FROM employee WHERE EmpID = ${EmpID}`, (error, results) => {
     if (error) {
       res.status(500).send(error);
     } else {
       const employeeDaysOff = results[0].DaysOff;
       if (employeeDaysOff >= daysOff) {
         // Employee has enough days off, so deduct days off taken
-        connection.query(`UPDATE employee SET DaysOff = DaysOff - ${daysOff} WHERE EmpID = ${EmpID}`, (error) => {
+        mysqlConnection.query(`UPDATE employee SET DaysOff = DaysOff - ${daysOff} WHERE EmpID = ${EmpID}`, (error) => {
           if (error) {
             res.status(500).send(error);
           } else {
@@ -192,35 +194,48 @@ app.get('/check-days-off', (req, res) => {
   });
 });
 
-//Get an employee's supervisor
-app.get('/employee-supervisor/:EmpID', (req, res) => {
-  const EmpID = req.params.EmpID;
-
+//Get employee's supervisor
+app.get('/employee-supervisor', (req, res) => {
+  const EmpID = req.body.EmpID;
+  
   // Get selected employee's information
-  connection.query(`SELECT FirstName, LastName, email, phone, job_title FROM employee WHERE EmpID = ${EmpID}`, (error, employeeResults) => {
+  mysqlConnection.query(`SELECT FirstName, LastName, email, phone, job_title FROM employee WHERE EmpID = ${EmpID}`, (error, employeeResults) => {
     if (error) {
-      res.status(500).send(error);
+      res.status(500).send({ error: error });
     } else {
       if(employeeResults[0].JobTitle == "manager")
       {
-        res.send(`The selected employee ${employeeResults[0].FirstName} ${employeeResults[0].LastName} is the Manager and has no supervisor.`);
+        res.send({ message: `The selected employee ${employeeResults[0].FirstName} ${employeeResults[0].LastName} is the Manager and has no supervisor.` });
       }else
       {
-        connection.query(`SELECT dept_name FROM employee WHERE EmpID = ${EmpID}`, (error, deptResults) => {
+        mysqlConnection.query(`SELECT dept_name FROM employee WHERE EmpID = ${EmpID}`, (error, deptResults) => {
           if (error) {
-            res.status(500).send(error);
+            res.status(500).send({ error: error });
           } else {
             const dept_name = deptResults[0].dept_name;
-            connection.query(`SELECT dept_head FROM departments WHERE dept_name = "${dept_name}"`, (error, supervisorResults) => {
+            mysqlConnection.query(`SELECT dept_head FROM departments WHERE dept_name = "${dept_name}"`, (error, supervisorResults) => {
               if (error) {
-                res.status(500).send(error);
+                res.status(500).send({ error: error });
               } else {
                 const supervisorEmpID = supervisorResults[0].dept_head;
-                connection.query(`SELECT FirstName, LastName, email, phone, job_title FROM employee WHERE EmpID = ${supervisorEmpID}`, (error, supervisorInfo) => {
+                mysqlConnection.query(`SELECT FirstName, LastName, email, phone, job_title FROM employee WHERE EmpID = ${supervisorEmpID}`, (error, supervisorInfo) => {
                   if (error) {
-                    res.status(500).send(error);
+                    res.status(500).send({ error: error });
                   } else {
-                    res.send(`Selected Employee: ${employeeResults[0].FirstName} ${employeeResults[0].LastName}, Email: ${employeeResults[0].Email}, Phone: ${employeeResults[0].Phone}, Job Title: ${employeeResults[0].JobTitle} Supervisor: ${supervisorInfo[0].FirstName} ${supervisorInfo[0].LastName}, Email: ${supervisorInfo[0].email}, Phone: ${supervisorInfo[0].phone}, Job Title: ${supervisorInfo[0].job_title}`);
+                    res.send({
+                      employee: {
+                        name: `${employeeResults[0].FirstName} ${employeeResults[0].LastName}`,
+                        email: employeeResults[0].email,
+                        phone: employeeResults[0].phone,
+                        job_title: employeeResults[0].job_title
+                      },
+                      supervisor: {
+                        name: `${supervisorInfo[0].FirstName} ${supervisorInfo[0].LastName}`,
+                        email: supervisorInfo[0].email,
+                        phone: supervisorInfo[0].phone,
+                        job_title: supervisorInfo[0].job_title
+                      }
+                    });
                   }
                 });
               }
@@ -232,17 +247,17 @@ app.get('/employee-supervisor/:EmpID', (req, res) => {
   });
 });
 
-//Display projects assigned to each department
-app.get('/projects-by-dept/:dept_id', (req, res) => {
-  const dept_id = req.params.dept_id;
+//Display projects assigned to each departments 
+app.post('/projects-by-dept', (req, res) => {
+  const dept_id = req.body.dept_id;
 
-  connection.query(`SELECT dept_name, dept_head FROM departments WHERE dept_id = ${dept_id}`, (error, deptResults) => {
+  mysqlConnection.query(`SELECT dept_name, dept_head FROM departments WHERE dept_id = ${dept_id}`, (error, deptResults) => {
     if (error) {
       res.status(500).send(error);
     } else {
       const dept_name = deptResults[0].dept_name;
       const dept_head = deptResults[0].dept_head;
-      connection.query(`SELECT project_name, start_date, end_date, EmpID FROM projects WHERE dept_id = ${dept_id}`, (error, projectResults) => {
+      mysqlConnection.query(`SELECT project_name, start_date, end_date, EmpID FROM projects WHERE dept_id = ${dept_id}`, (error, projectResults) => {
         if (error) {
           res.status(500).send(error);
         } else {
@@ -254,7 +269,7 @@ app.get('/projects-by-dept/:dept_id', (req, res) => {
             let projects = "";
             projectResults.forEach((project) => {
               const EmpID = project.EmpID;
-              connection.query(`SELECT FirstName, LastName, Email, Phone, job_title FROM employee WHERE EmpID = ${EmpID}`, (error, empResults) => {
+              mysqlConnection.query(`SELECT FirstName, LastName, Email, Phone, job_title FROM employee WHERE EmpID = ${EmpID}`, (error, empResults) => {
                 if (error) {
                   res.status(500).send(error);
                 } else {
@@ -264,7 +279,7 @@ app.get('/projects-by-dept/:dept_id', (req, res) => {
                   const emp_job_title = empResults[0].job_title;
                   projects += `Project Name: ${project.project_name}, Start Date: ${project.start_date}, End Date: ${project.end_date}, Assigned Employee: ${emp_name}, Email: ${emp_email}, Phone: ${emp_phone}, Job Title: ${emp_job_title}`;
                   if (projectResults.indexOf(project) === projectResults.length - 1) {
-                    connection.query(`SELECT FirstName, LastName FROM employee WHERE EmpID = ${dept_head}`, (error, headResults) => {
+                    mysqlConnection.query(`SELECT FirstName, LastName FROM employee WHERE EmpID = ${dept_head}`, (error, headResults) => {
                       if (error) {
                         res.status(500).send(error);
                       } else {
@@ -284,14 +299,14 @@ app.get('/projects-by-dept/:dept_id', (req, res) => {
 });
 
 //Change password for an employee: Store hashed and salted version on the database
-app.post('/set-password/:EmpID', (req, res) => {
-  const EmpID = req.params.EmpID;
+app.post('/set-password', (req, res) => {
+  const EmpID = req.body.EmpID;
   const plainPassword = req.body.password;
   const saltRounds = 10;
 
   bcrypt.genSalt(saltRounds, function(err, salt) {
     bcrypt.hash(plainPassword, salt, function(err, hashedPassword) {
-      connection.query(`UPDATE employee SET password = '${hashedPassword}' WHERE EmpID = ${EmpID}`, (error, result) => {
+      mysqlConnection.query(`UPDATE employee SET password = '${hashedPassword}' WHERE EmpID = ${EmpID}`, (error, result) => {
         if (error) {
           res.status(500).send(error);
         } else {
@@ -308,7 +323,7 @@ app.post('/login', (req, res) => {
   const email = req.body.email;
   const plainPassword = req.body.password;
 
-  connection.query(`SELECT EmpID, password FROM employee WHERE email = '${email}'`, (error, results) => {
+  mysqlConnection.query(`SELECT EmpID, password FROM employee WHERE email = '${email}'`, (error, results) => {
     if (error) {
       res.status(500).send(error);
     } else if (results.length > 0) {
@@ -350,11 +365,11 @@ app.post('/login', (req, res) => {
 });
 
 // update endpoint
-app.put('/employee/:EmpID',verifyToken, (req, res) => {
-  const EmpID = req.params.EmpID;
+app.put('/employee',verifyToken, (req, res) => {
+  const EmpID = req.body.EmpID;
   const { FirstName, LastName, email, phone } = req.body;
 
-  connection.query(
+  mysqlConnection.query(
     `UPDATE employee SET FirstName = '${FirstName}', LastName = '${LastName}', email = '${email}', phone = '${phone}' WHERE EmpID = ${EmpID}`,
     (error, result) => {
       if (error) {
@@ -385,6 +400,7 @@ app.put('/employee/:EmpID',verifyToken, (req, res) => {
     }
   );
 });
+
 
 app.listen(3550, () =>
   console.log("Express server is running at port no : 3550")
