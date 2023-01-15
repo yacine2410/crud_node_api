@@ -52,8 +52,10 @@ mysqlConnection.connect((err) => {
 });
 
 //Administrator login, Access token generation and refreshment
-const username = USERNAME_ADMIN;
-const password = PASSWORD_ADMIN;
+//const username = USERNAME_ADMIN;
+//const password = PASSWORD_ADMIN;
+const username = "yacine_montacer";
+const password = "kScJM2Hf5_TV?hN-";
 app.post("/", (req, res, next) => {
   let p_username = req.body.username;
   let p_password = req.body.password;
@@ -70,7 +72,6 @@ app.post("/", (req, res, next) => {
         });
       }
     );
-
     // Refresh token after 10 minutes
     setTimeout(() => {
       var newToken = jwt.sign(
@@ -382,6 +383,6 @@ app.put('/employee/:EmpID',verifyToken, (req, res) => {
   );
 });
 
-app.listen(3506, () =>
-  console.log("Express server is running at port no : 3505")
+app.listen(3550, () =>
+  console.log("Express server is running at port no : 3550")
 );
