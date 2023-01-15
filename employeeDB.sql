@@ -29,28 +29,34 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `employee` (
   `EmpID` int(20) NOT NULL,
-  `Name` varchar(20) NOT NULL,
+  -- employee ID
+  `FirstName` varchar(20) NOT NULL,
+  `LastName` varchar(20) NOT NULL,
+  -- employee name
   `EmpCode` int(20) NOT NULL,
+  --employee code
   `Salary` int(20) NOT NULL,
+  --employee salary
   `DaysOff` int(20) NOT NULL,
+  --number of days off the employee has available
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `employee`
 --
 
-INSERT INTO `employee` (`EmpID`, `Name`, `EmpCode`, `Salary`, `DaysOff`) VALUES
-(10, 'Peter Griffin', 7892, 500000, 12),
-(11, 'Johnny Candito', 13, 40000, 10),
-(12, 'Ed Coan', 89, 77000, 6),
-(13, 'Danielle Melo', 2121, 88000, 5),
-(14, 'Amanda Ann', 3232, 110000, 0),
-(15, 'Jaquin Phoenix', 87564, 100000, 2),
-(16, 'John Doe', 433512, 90000, 1),
-(17, 'Mark Bell', 2135, 80000, 3),
-(18, 'Mark Baum', 5468, 60000, 1),
-(19, 'Matt Wenning', 2356, 60000, 20),
-(20, 'Homer Simpson', 5421, 300000, 25);
+INSERT INTO `employee` (`EmpID`, `FirstName`, `LastName`, `EmpCode`, `Salary`, `DaysOff`) VALUES
+(10, 'Peter', 'Griffin', 7892, 500000, 12),
+(11, 'Johnny', 'Candito', 13, 40000, 10),
+(12, 'Ed', 'Coan', 89, 77000, 6),
+(13, 'Danielle', 'Melo', 2121, 88000, 5),
+(14, 'Amanda', 'Ann', 3232, 110000, 0),
+(15, 'Jaquin', 'Phoenix', 87564, 100000, 2),
+(16, 'John', 'Doe', 433512, 90000, 1),
+(17, 'Mark', 'Bell', 2135, 80000, 3),
+(18, 'Mark', 'Baum', 5468, 60000, 1),
+(19, 'Matt', 'Wenning', 2356, 60000, 20),
+(20, 'Homer', 'Simpson', 5421, 300000, 25);
 
 --
 -- Indexes for dumped tables

@@ -93,10 +93,10 @@ app.delete("/employees/:id", methods.ensureToken, (req, res) => {
 app.post("/employees", (req, res) => {
   let emp = req.body;
   var sql =
-    "INSERT INTO employee (EmpID, Name, EmpCode, Salary) VALUES ( ?,?,?,?)";
+    "INSERT INTO employee (EmpID, FirstName, LastName, EmpCode, Salary, DaysOff) VALUES ( ?,?,?,?,?,?)";
   mysqlConnection.query(
     sql,
-    [emp.EmpID, emp.Name, emp.EmpCode, emp.Salary],
+    [emp.EmpID, emp.FirstName, emp.LastName,  emp.EmpCode, emp.Salary, emp.DaysOff],
     (err, rows, fields) => {
       if (!err) res.send("employee Inserted ");
       else console.log(err);
@@ -108,10 +108,10 @@ app.post("/employees", (req, res) => {
 app.put("/employees", (req, res) => {
   let emp = req.body;
   var sql =
-    "UPDATE employee SET Name = ?, EmpCode = ?, Salary =? WHERE EmpID = ?";
+    "UPDATE employee SET FirstName = ?, LastName = ?, EmpCode = ?, Salary = ?, DaysOff = ? WHERE EmpID = ?";
   mysqlConnection.query(
     sql,
-    [emp.Name, emp.EmpCode, emp.Salary, emp.EmpID],
+    [emp.FirstName, emp.LastName, emp.EmpCode, emp.Salary, emp.DaysOff, emp.EmpID],
     (err, rows, fields) => {
       if (!err) res.send("employee Updated ");
       else console.log(err);
