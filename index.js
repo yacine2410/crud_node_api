@@ -9,6 +9,25 @@ const nodemailer = require('nodemailer');
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+//Verify token function for employee login
+function verifyToken(req, res, next) {
+  const token = req.headers['x-access-token'];
+  if (!token) {
+    return res.status(401).send({ auth: false, message: 'No token provided.' });
+  }
+
+  jwt.verify(token, 'secretkey', function(err, decoded) {
+    if (err) {
+      return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+    }
+    if(decoded.EmpID != req.params.EmpID){
+      return res.status(401).send({ auth: false, message: 'Unauthorized access.' });
+    }
+    req.EmpID = decoded.EmpID;
+    next();
+  });
+}
+
 var mysqlConnection = mysql.createConnection({
   host: "localhost",
   user: "root",
@@ -273,7 +292,8 @@ app.post('/set-password/:EmpID', (req, res) => {
   });
 });
 
-//login and notification email
+//employee log-in, token, edit personal information & notification email
+// login endpoint
 app.post('/login', (req, res) => {
   const email = req.body.email;
   const plainPassword = req.body.password;
@@ -286,39 +306,76 @@ app.post('/login', (req, res) => {
       bcrypt.compare(plainPassword, hashedPassword, function(err, passwordMatch) {
         if (passwordMatch) {
           const EmpID = results[0].EmpID;
+          const token = jwt.sign({EmpID: EmpID}, 'secretkey', { expiresIn: '24h' });
+          
           // send notification email
-          const transporter = nodemailer.createTransport({
+          let transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
               user: 'IT325project@gmail.com',
               pass: 'IT325project@Yacine'
             }
           });
-          const mailOptions = {
+          let mailOptions = {
             from: 'IT325project@gmail.com',
             to: email,
-            subject: 'Login Successful',
-            text: `Hello, you have successfully logged in to your account. Your EmpID is ${EmpID}`
+            subject: 'Successful login',
+            text: 'You have successfully logged in to your account.'
           };
           transporter.sendMail(mailOptions, function(error, info){
             if (error) {
-              console.log(error);
+              res.status(500).send(error);
             } else {
-              console.log('Email sent: ' + info.response);
-              res.status(200).send(`Welcome, you have successfully logged in to your account. Your EmpID is ${EmpID}`);
+              res.status(200).send({ auth: true, token: token });
             }
           });
         } else {
-          res.status(401).send('Invalid email or password');
+          res.status(401).send({ auth: false, message: 'Invalid email or password' });
         }
       });
     } else {
-      res.status(401).send('Invalid email or password');
+      res.status(401).send({ auth: false, message: 'Invalid email or password' });
     }
   });
 });
 
+// update endpoint
+app.put('/employee/:EmpID',verifyToken, (req, res) => {
+  const EmpID = req.params.EmpID;
+  const { FirstName, LastName, email, phone } = req.body;
 
-app.listen(3501, () =>
-  console.log("Express server is running at port no : 3501")
+  connection.query(
+    `UPDATE employee SET FirstName = '${FirstName}', LastName = '${LastName}', email = '${email}', phone = '${phone}' WHERE EmpID = ${EmpID}`,
+    (error, result) => {
+      if (error) {
+        res.status(500).send(error);
+      } else {
+        // send notification email
+        let transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+            user: 'IT325project@gmail.com',
+            pass: 'IT325project@Yacine'
+          }
+        });
+        let mailOptions = {
+          from: 'IT325project@gmail.com',
+          to: email,
+          subject: 'Successful update',
+          text: 'You have successfully updated your personal information.'
+        };
+        transporter.sendMail(mailOptions, function(error, info){
+          if (error) {
+            res.status(500).send(error);
+          } else {
+            res.status(200).send(`Employee with EmpID ${EmpID} has been updated!`);
+          }
+        });
+      }
+    }
+  );
+});
+
+app.listen(3500, () =>
+  console.log("Express server is running at port no : 3500")
 );
