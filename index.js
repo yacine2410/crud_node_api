@@ -1,5 +1,7 @@
 const mysql = require("mysql");
 const express = require("express");
+const bodyParser = require('body-parser');
+const db = require('./db');
 var methods = require("./methodTokens");
 var app = express();
 let jwt = require("jsonwebtoken");
@@ -93,10 +95,10 @@ app.delete("/employees/:id", methods.ensureToken, (req, res) => {
 app.post("/employees", (req, res) => {
   let emp = req.body;
   var sql =
-    "INSERT INTO employee (EmpID, FirstName, LastName, EmpCode, Salary, DaysOff) VALUES ( ?,?,?,?,?,?)";
+    "INSERT INTO employee (EmpID, FirstName, LastName, EmpCode, Salary, DaysOff, email, phone, job_title, dept_name) VALUES ( ?,?,?,?,?,?,?,?,?,?)";
   mysqlConnection.query(
     sql,
-    [emp.EmpID, emp.FirstName, emp.LastName,  emp.EmpCode, emp.Salary, emp.DaysOff],
+    [emp.EmpID, emp.FirstName, emp.LastName,  emp.EmpCode, emp.Salary, emp.DaysOff, emp.email, emp.phone, emp.job_title, emp.dept_name],
     (err, rows, fields) => {
       if (!err) res.send("employee Inserted ");
       else console.log(err);
@@ -108,16 +110,18 @@ app.post("/employees", (req, res) => {
 app.put("/employees", (req, res) => {
   let emp = req.body;
   var sql =
-    "UPDATE employee SET FirstName = ?, LastName = ?, EmpCode = ?, Salary = ?, DaysOff = ? WHERE EmpID = ?";
+    "UPDATE employee SET FirstName = ?, LastName = ?, EmpCode = ?, Salary = ?, DaysOff = ?, email = ?, phone = ?, job_title = ?, dept_name = ? WHERE EmpID = ?";
   mysqlConnection.query(
     sql,
-    [emp.FirstName, emp.LastName, emp.EmpCode, emp.Salary, emp.DaysOff, emp.EmpID],
+    [emp.FirstName, emp.LastName, emp.EmpCode, emp.Salary, emp.DaysOff, emp.email, emp.phone, emp.job_title, emp.dept_name, emp.EmpID],
     (err, rows, fields) => {
       if (!err) res.send("employee Updated ");
       else console.log(err);
     }
   );
 });
+
+
 
 app.listen(3000, () =>
   console.log("Express server is running at port no : 3000")
