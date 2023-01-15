@@ -4,7 +4,13 @@ var methods = require("./methodTokens");
 var app = express();
 let jwt = require("jsonwebtoken");
 const nodemailer = require('nodemailer');
+require('dotenv').config();
 
+//environment variables
+const emailUser = process.env.EMAIL_USER;
+const emailPass = process.env.EMAIL_PASS;
+const usernameAdmin = process.env.USERNAME_ADMIN;
+const passwordAdmin = process.env.PASSWORD_ADMIN;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -46,8 +52,8 @@ mysqlConnection.connect((err) => {
 });
 
 //Administrator login, Access token generation and refreshment
-const username = "yacine_montacer";
-const password = "kScJM2Hf5_TV?hN-"; 
+const username = "USERNAME_ADMIN";
+const password = "PASSWORD_ADMIN"; 
 app.post("/", (req, res, next) => {
   let p_username = req.body.username;
   let p_password = req.body.password;
@@ -312,12 +318,12 @@ app.post('/login', (req, res) => {
           let transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-              user: 'IT325project@gmail.com',
-              pass: 'IT325project@Yacine'
+              user: 'EMAIL_USER',
+              pass: 'EMAIL_PASS'
             }
           });
           let mailOptions = {
-            from: 'IT325project@gmail.com',
+            from: 'EMAIL_USER',
             to: email,
             subject: 'Successful login',
             text: 'You have successfully logged in to your account.'
@@ -354,12 +360,12 @@ app.put('/employee/:EmpID',verifyToken, (req, res) => {
         let transporter = nodemailer.createTransport({
           service: 'gmail',
           auth: {
-            user: 'IT325project@gmail.com',
-            pass: 'IT325project@Yacine'
+            user: 'EMAIL_USER',
+            pass: 'EMAIL_PASS'
           }
         });
         let mailOptions = {
-          from: 'IT325project@gmail.com',
+          from: 'EMAIL_USER',
           to: email,
           subject: 'Successful update',
           text: 'You have successfully updated your personal information.'
