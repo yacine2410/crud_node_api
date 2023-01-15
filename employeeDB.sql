@@ -31,25 +31,26 @@ CREATE TABLE `employee` (
   `EmpID` int(20) NOT NULL,
   `Name` varchar(20) NOT NULL,
   `EmpCode` int(20) NOT NULL,
-  `Salary` int(20) NOT NULL
+  `Salary` int(20) NOT NULL,
+  `DaysOff` int(20) NOT NULL,
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `employee`
 --
 
-INSERT INTO `employee` (`EmpID`, `Name`, `EmpCode`, `Salary`) VALUES
-(10, 'Peter Griffin', 7892, 500000),
-(11, 'Johnny Candito', 13, 40000),
-(12, 'Ed Coan', 89, 77000),
-(13, 'Danielle Melo', 2121, 88000),
-(14, 'Amanda Ann', 3232, 110000),
-(15, 'Jaquin Phoenix', 87564, 100000),
-(16, 'Osama Ben Laden', 433512, 90000),
-(17, 'Mark Bell', 2135, 80000),
-(18, 'Mark Baum', 5468, 60000),
-(19, 'Michael Corleone', 2356, 60000),
-(20, 'Homer Simpson', 5421, 300000);
+INSERT INTO `employee` (`EmpID`, `Name`, `EmpCode`, `Salary`, `DaysOff`) VALUES
+(10, 'Peter Griffin', 7892, 500000, 12),
+(11, 'Johnny Candito', 13, 40000, 10),
+(12, 'Ed Coan', 89, 77000, 6),
+(13, 'Danielle Melo', 2121, 88000, 5),
+(14, 'Amanda Ann', 3232, 110000, 0),
+(15, 'Jaquin Phoenix', 87564, 100000, 2),
+(16, 'John Doe', 433512, 90000, 1),
+(17, 'Mark Bell', 2135, 80000, 3),
+(18, 'Mark Baum', 5468, 60000, 1),
+(19, 'Matt Wenning', 2356, 60000, 20),
+(20, 'Homer Simpson', 5421, 300000, 25);
 
 --
 -- Indexes for dumped tables
