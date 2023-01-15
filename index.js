@@ -1,9 +1,9 @@
 require('dotenv').config();
 //environment variables
-const EMAIL_USER = process.env.EMAIL_USER;
-const EMAIL_PASS = process.env.EMAIL_PASS;
-const USERNAME_ADMIN = process.env.USERNAME_ADMIN;
-const PASSWORD_ADMIN = process.env.PASSWORD_ADMIN;
+let EMAIL_USER = process.env.EMAIL_USER;
+let EMAIL_PASS = process.env.EMAIL_PASS;
+let USERNAME_ADMIN = process.env.USERNAME_ADMIN;
+let PASSWORD_ADMIN = process.env.PASSWORD_ADMIN;
 
 const mysql = require("mysql");
 const express = require("express");
@@ -52,10 +52,10 @@ mysqlConnection.connect((err) => {
 });
 
 //Administrator login, Access token generation and refreshment
-//const username = USERNAME_ADMIN;
-//const password = PASSWORD_ADMIN;
-const username = "yacine_montacer";
-const password = "kScJM2Hf5_TV?hN-";
+const username = USERNAME_ADMIN;
+const password = PASSWORD_ADMIN;
+//const username = "yacine_montacer";
+//const password = "kScJM2Hf5_TV?hN-";
 app.post("/", (req, res, next) => {
   let p_username = req.body.username;
   let p_password = req.body.password;
