@@ -45,7 +45,7 @@ CREATE TABLE `employee` (
 -- Dumping data for table `employee`
 --
 
-INSERT INTO `employee` (`EmpID`, `FirstName`, `LastName`, `EmpCode`, `Salary`, `DaysOff`) VALUES
+/* INSERT INTO `employee` (`EmpID`, `FirstName`, `LastName`, `EmpCode`, `Salary`, `DaysOff`) VALUES
 (10, 'Peter', 'Griffin', 7892, 500000, 12),
 (11, 'Johnny', 'Candito', 13, 40000, 10),
 (12, 'Ed', 'Coan', 89, 77000, 6),
@@ -56,7 +56,7 @@ INSERT INTO `employee` (`EmpID`, `FirstName`, `LastName`, `EmpCode`, `Salary`, `
 (17, 'Mark', 'Bell', 2135, 80000, 3),
 (18, 'Mark', 'Baum', 5468, 60000, 1),
 (19, 'Matt', 'Wenning', 2356, 60000, 20),
-(20, 'Homer', 'Simpson', 5421, 300000, 25);
+(20, 'Homer', 'Simpson', 5421, 300000, 25); */
 
 --
 -- Indexes for dumped tables
@@ -68,6 +68,14 @@ INSERT INTO `employee` (`EmpID`, `FirstName`, `LastName`, `EmpCode`, `Salary`, `
 ALTER TABLE `employee`
   ADD PRIMARY KEY (`EmpID`);
 COMMIT;
+
+--Add columns to table employee 
+ALTER TABLE employee
+ADD COLUMN email VARCHAR(255) NOT NULL,
+ADD COLUMN phone VARCHAR(20) NOT NULL,
+ADD COLUMN job_title VARCHAR(255) NOT NULL,
+ADD COLUMN department VARCHAR(255) NOT NULL;
+
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
