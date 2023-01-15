@@ -1,16 +1,16 @@
+require('dotenv').config();
+//environment variables
+const EMAIL_USER = process.env.EMAIL_USER;
+const EMAIL_PASS = process.env.EMAIL_PASS;
+const USERNAME_ADMIN = process.env.USERNAME_ADMIN;
+const PASSWORD_ADMIN = process.env.PASSWORD_ADMIN;
+
 const mysql = require("mysql");
 const express = require("express");
 var methods = require("./methodTokens");
 var app = express();
 let jwt = require("jsonwebtoken");
 const nodemailer = require('nodemailer');
-require('dotenv').config();
-
-//environment variables
-const emailUser = process.env.EMAIL_USER;
-const emailPass = process.env.EMAIL_PASS;
-const usernameAdmin = process.env.USERNAME_ADMIN;
-const passwordAdmin = process.env.PASSWORD_ADMIN;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -52,8 +52,8 @@ mysqlConnection.connect((err) => {
 });
 
 //Administrator login, Access token generation and refreshment
-const username = "USERNAME_ADMIN";
-const password = "PASSWORD_ADMIN"; 
+const username = USERNAME_ADMIN;
+const password = PASSWORD_ADMIN;
 app.post("/", (req, res, next) => {
   let p_username = req.body.username;
   let p_password = req.body.password;
@@ -318,12 +318,12 @@ app.post('/login', (req, res) => {
           let transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-              user: 'EMAIL_USER',
-              pass: 'EMAIL_PASS'
+              user: EMAIL_USER,
+              pass: EMAIL_PASS
             }
           });
           let mailOptions = {
-            from: 'EMAIL_USER',
+            from: EMAIL_USER,
             to: email,
             subject: 'Successful login',
             text: 'You have successfully logged in to your account.'
@@ -360,8 +360,8 @@ app.put('/employee/:EmpID',verifyToken, (req, res) => {
         let transporter = nodemailer.createTransport({
           service: 'gmail',
           auth: {
-            user: 'EMAIL_USER',
-            pass: 'EMAIL_PASS'
+            user: EMAIL_USER,
+            pass: EMAIL_PASS
           }
         });
         let mailOptions = {
@@ -382,6 +382,6 @@ app.put('/employee/:EmpID',verifyToken, (req, res) => {
   );
 });
 
-app.listen(3500, () =>
-  console.log("Express server is running at port no : 3500")
+app.listen(3506, () =>
+  console.log("Express server is running at port no : 3505")
 );
