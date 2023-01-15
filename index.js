@@ -1,7 +1,5 @@
 const mysql = require("mysql");
 const express = require("express");
-const bodyParser = require('body-parser');
-const db = require('./db');
 var methods = require("./methodTokens");
 var app = express();
 let jwt = require("jsonwebtoken");
@@ -14,7 +12,7 @@ var mysqlConnection = mysql.createConnection({
   user: "root",
   password: "",
   database: "employeeDB1",
-  port: "3306",
+  port: "3000",
   multipleStatements: true,
 });
 
@@ -123,6 +121,6 @@ app.put("/employees", (req, res) => {
 
 
 
-app.listen(3000, () =>
-  console.log("Express server is running at port no : 3000")
+app.listen(3500, () =>
+  console.log("Express server is running at port no : 3500")
 );
