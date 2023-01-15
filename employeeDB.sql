@@ -79,11 +79,42 @@ INSERT INTO `employee` (`EmpID`, `FirstName`, `LastName`, `EmpCode`, `Salary`, `
 (19, 'Matt', 'Wenning', 2356, 60000, 20, 'yacin.montacer@gmail.com', '+216 55 555 555', 'junior accountant', 'Accounting'),
 (20, 'Homer', 'Simpson', 5421, 300000, 25, 'yacin.montacer@gmail.com', '+216 55 555 555', 'junior engineer', 'IT');
 
+-- Create a table projects
 
-INSERT INTO departments (dept_name, dept_head) VALUES
+CREATE TABLE `projects`(
+  `project_id` INT PRIMARY KEY,
+  `project_name` VARCHAR(255) NOT NULL,
+  `dept_id` INT,
+  FOREIGN KEY (`dept_id`) REFERENCES `departments`(`dept_id`),
+  `start_date` DATE NOT NULL,
+  `end_date` DATE,
+  `EmpID` INT,
+  FOREIGN KEY (`EmpID`) REFERENCES `employee`(`EmpID`)
+);
+
+
+INSERT INTO `departments` (`dept_name`, `dept_head`) VALUES
     ('IT', 12),
     ('HR', 14),
     ('Accounting', 13);
+
+-- Add passwords column to employees 
+ALTER TABLE `employee` ADD `password` VARCHAR(255);
+
+
+INSERT INTO `projects` (`project_id`, `project_name`, `dept_id`, `start_date`, `end_date`, `EmpID`)
+VALUES 
+(1, 'Project A', 1, '2022-01-01', '2022-12-31', 10),
+(2, 'Project B', 2, '2022-01-01', '2022-12-31', 11),
+(3, 'Project C', 3, '2022-01-01', '2022-12-31', 12),
+(4, 'Project D', 1, '2022-01-01', '2022-12-31', 13),
+(5, 'Project E', 2, '2022-01-01', '2022-12-31', 14),
+(6, 'Project F', 3, '2022-01-01', '2022-12-31', 15),
+(7, 'Project G', 1, '2022-01-01', '2022-12-31', 16),
+(8, 'Project H', 2, '2022-01-01', '2022-12-31', 17),
+(9, 'Project I', 3, '2022-01-01', '2022-12-31', 18),
+(10, 'Project J', 1, '2022-01-01', '2022-12-31', 19);
+
 
 --
 -- Indexes for dumped tables

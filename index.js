@@ -3,6 +3,8 @@ const express = require("express");
 var methods = require("./methodTokens");
 var app = express();
 let jwt = require("jsonwebtoken");
+const nodemailer = require('nodemailer');
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -24,9 +26,9 @@ mysqlConnection.connect((err) => {
   }
 });
 
+//Administrator login, Access token generation and refreshment
 const username = "yacine_montacer";
-const password = "kScJM2Hf5_TV?hN-";
-
+const password = "kScJM2Hf5_TV?hN-"; 
 app.post("/", (req, res, next) => {
   let p_username = req.body.username;
   let p_password = req.body.password;
@@ -43,6 +45,20 @@ app.post("/", (req, res, next) => {
         });
       }
     );
+
+    // Refresh token after 10 minutes
+    setTimeout(() => {
+      var newToken = jwt.sign(
+        { username: username },
+        "secretkey",
+        { expiresIn: "15m" }
+      );
+      res.send({
+        ok: true,
+        token: newToken,
+        message: "Token refreshed",
+      });
+    }, 600000);
   } else {
     res.send({
       ok: false,
@@ -119,8 +135,190 @@ app.put("/employees", (req, res) => {
   );
 });
 
+//Book days off for an employee
+app.get('/check-days-off/:EmpID/:daysOff', (req, res) => {
+  const EmpID = req.params.EmpID;
+  const daysOff = req.params.daysOff;
+
+  // Check if employee has enough days off available
+  connection.query(`SELECT DaysOff FROM employee WHERE EmpID = ${EmpID}`, (error, results) => {
+    if (error) {
+      res.status(500).send(error);
+    } else {
+      const employeeDaysOff = results[0].DaysOff;
+      if (employeeDaysOff >= daysOff) {
+        // Employee has enough days off, so deduct days off taken
+        connection.query(`UPDATE employee SET DaysOff = DaysOff - ${daysOff} WHERE EmpID = ${EmpID}`, (error) => {
+          if (error) {
+            res.status(500).send(error);
+          } else {
+            res.send(`Successfully deducted ${daysOff} days off from employee with EmpID ${EmpID}.`);
+          }
+        });
+      } else {
+        // Employee does not have enough days off
+        res.send(`Employee with EmpID ${EmpID} does not have enough days off available.`);
+      }
+    }
+  });
+});
+
+//Get an employee's supervisor
+app.get('/employee-supervisor/:EmpID', (req, res) => {
+  const EmpID = req.params.EmpID;
+
+  // Get selected employee's information
+  connection.query(`SELECT FirstName, LastName, email, phone, job_title FROM employee WHERE EmpID = ${EmpID}`, (error, employeeResults) => {
+    if (error) {
+      res.status(500).send(error);
+    } else {
+      if(employeeResults[0].JobTitle == "manager")
+      {
+        res.send(`The selected employee ${employeeResults[0].FirstName} ${employeeResults[0].LastName} is the Manager and has no supervisor.`);
+      }else
+      {
+        connection.query(`SELECT dept_name FROM employee WHERE EmpID = ${EmpID}`, (error, deptResults) => {
+          if (error) {
+            res.status(500).send(error);
+          } else {
+            const dept_name = deptResults[0].dept_name;
+            connection.query(`SELECT dept_head FROM departments WHERE dept_name = "${dept_name}"`, (error, supervisorResults) => {
+              if (error) {
+                res.status(500).send(error);
+              } else {
+                const supervisorEmpID = supervisorResults[0].dept_head;
+                connection.query(`SELECT FirstName, LastName, email, phone, job_title FROM employee WHERE EmpID = ${supervisorEmpID}`, (error, supervisorInfo) => {
+                  if (error) {
+                    res.status(500).send(error);
+                  } else {
+                    res.send(`Selected Employee: ${employeeResults[0].FirstName} ${employeeResults[0].LastName}, Email: ${employeeResults[0].Email}, Phone: ${employeeResults[0].Phone}, Job Title: ${employeeResults[0].JobTitle} Supervisor: ${supervisorInfo[0].FirstName} ${supervisorInfo[0].LastName}, Email: ${supervisorInfo[0].email}, Phone: ${supervisorInfo[0].phone}, Job Title: ${supervisorInfo[0].job_title}`);
+                  }
+                });
+              }
+            });
+          }
+        });
+      }
+    }
+  });
+});
+
+//Display projects assigned to each department
+app.get('/projects-by-dept/:dept_id', (req, res) => {
+  const dept_id = req.params.dept_id;
+
+  connection.query(`SELECT dept_name, dept_head FROM departments WHERE dept_id = ${dept_id}`, (error, deptResults) => {
+    if (error) {
+      res.status(500).send(error);
+    } else {
+      const dept_name = deptResults[0].dept_name;
+      const dept_head = deptResults[0].dept_head;
+      connection.query(`SELECT project_name, start_date, end_date, EmpID FROM projects WHERE dept_id = ${dept_id}`, (error, projectResults) => {
+        if (error) {
+          res.status(500).send(error);
+        } else {
+          if(projectResults.length == 0)
+          { 
+            res.send(`There are no projects assigned to department with id ${dept_id}`);
+          }else
+          {
+            let projects = "";
+            projectResults.forEach((project) => {
+              const EmpID = project.EmpID;
+              connection.query(`SELECT FirstName, LastName, Email, Phone, job_title FROM employee WHERE EmpID = ${EmpID}`, (error, empResults) => {
+                if (error) {
+                  res.status(500).send(error);
+                } else {
+                  const emp_name = empResults[0].FirstName + " " + empResults[0].LastName;
+                  const emp_email = empResults[0].Email;
+                  const emp_phone = empResults[0].Phone;
+                  const emp_job_title = empResults[0].job_title;
+                  projects += `Project Name: ${project.project_name}, Start Date: ${project.start_date}, End Date: ${project.end_date}, Assigned Employee: ${emp_name}, Email: ${emp_email}, Phone: ${emp_phone}, Job Title: ${emp_job_title}`;
+                  if (projectResults.indexOf(project) === projectResults.length - 1) {
+                    connection.query(`SELECT FirstName, LastName FROM employee WHERE EmpID = ${dept_head}`, (error, headResults) => {
+                      if (error) {
+                        res.status(500).send(error);
+                      } else {
+                        const head_name = headResults[0].FirstName + " " + headResults[0].LastName;
+                        res.send(`Department: ${dept_name}, Head: ${head_name}, Projects: ${projects}`);
+                      }
+                    });
+                  }
+                }
+              });
+            });
+          }
+        }
+      });
+    }
+  });
+});
+
+//Change password for an employee: Store hashed and salted version on the database
+app.post('/set-password/:EmpID', (req, res) => {
+  const EmpID = req.params.EmpID;
+  const plainPassword = req.body.password;
+  const saltRounds = 10;
+
+  bcrypt.genSalt(saltRounds, function(err, salt) {
+    bcrypt.hash(plainPassword, salt, function(err, hashedPassword) {
+      connection.query(`UPDATE employee SET password = '${hashedPassword}' WHERE EmpID = ${EmpID}`, (error, result) => {
+        if (error) {
+          res.status(500).send(error);
+        } else {
+          res.status(200).send(`Password for employee with EmpID ${EmpID} has been set successfully!`);
+        }
+      });
+    });
+  });
+});
+
+//login and notification email
+app.post('/login', (req, res) => {
+  const email = req.body.email;
+  const plainPassword = req.body.password;
+
+  connection.query(`SELECT EmpID, password FROM employee WHERE email = '${email}'`, (error, results) => {
+    if (error) {
+      res.status(500).send(error);
+    } else if (results.length > 0) {
+      const hashedPassword = results[0].password;
+      bcrypt.compare(plainPassword, hashedPassword, function(err, passwordMatch) {
+        if (passwordMatch) {
+          const EmpID = results[0].EmpID;
+          // send notification email
+          const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+              user: 'IT325project@gmail.com',
+              pass: 'IT325project@Yacine'
+            }
+          });
+          const mailOptions = {
+            from: 'IT325project@gmail.com',
+            to: email,
+            subject: 'Login Successful',
+            text: `Hello, you have successfully logged in to your account. Your EmpID is ${EmpID}`
+          };
+          transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+              console.log(error);
+            } else {
+              console.log('Email sent: ' + info.response);
+              res.status(200).send(`Welcome, you have successfully logged in to your account. Your EmpID is ${EmpID}`);
+            }
+          });
+        } else {
+          res.status(401).send('Invalid email or password');
+        }
+      });
+    } else {
+      res.status(401).send('Invalid email or password');
+    }
+  });
+});
 
 
-app.listen(3500, () =>
-  console.log("Express server is running at port no : 3500")
+app.listen(3501, () =>
+  console.log("Express server is running at port no : 3501")
 );
