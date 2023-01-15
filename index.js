@@ -1,9 +1,12 @@
-require('dotenv').config();
+//require('dotenv').config();
 //environment variables
-let EMAIL_USER = process.env.EMAIL_USER;
-let EMAIL_PASS = process.env.EMAIL_PASS;
-let USERNAME_ADMIN = process.env.USERNAME_ADMIN;
-let PASSWORD_ADMIN = process.env.PASSWORD_ADMIN;
+//let EMAIL_USER = process.env.EMAIL_USER;
+//let EMAIL_PASS = process.env.EMAIL_PASS;
+//let USERNAME_ADMIN = process.env.USERNAME_ADMIN;
+//let PASSWORD_ADMIN = process.env.PASSWORD_ADMIN;
+
+const EMAIL_USER = "IT325project@gmail.com";
+const EMAIL_PASS = "IT325project@Yacine";
 
 const mysql = require("mysql");
 const express = require("express");
@@ -52,10 +55,10 @@ mysqlConnection.connect((err) => {
 });
 
 //Administrator login, Access token generation and refreshment
-const username = USERNAME_ADMIN;
-const password = PASSWORD_ADMIN;
-//const username = "yacine_montacer";
-//const password = "kScJM2Hf5_TV?hN-";
+//const username = USERNAME_ADMIN;
+//const password = PASSWORD_ADMIN;
+const username = "yacine_montacer";
+const password = "kScJM2Hf5_TV?hN-";
 app.post("/", (req, res, next) => {
   let p_username = req.body.username;
   let p_password = req.body.password;
@@ -162,9 +165,9 @@ app.put("/employees", (req, res) => {
 });
 
 //Book days off for an employee
-app.get('/check-days-off/:EmpID/:daysOff', (req, res) => {
-  const EmpID = req.params.EmpID;
-  const daysOff = req.params.daysOff;
+app.get('/check-days-off', (req, res) => {
+  const EmpID = req.body.EmpID;
+  const daysOff = req.body.daysOff;
 
   // Check if employee has enough days off available
   connection.query(`SELECT DaysOff FROM employee WHERE EmpID = ${EmpID}`, (error, results) => {
