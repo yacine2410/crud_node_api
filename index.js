@@ -5,7 +5,7 @@
 //let USERNAME_ADMIN = process.env.USERNAME_ADMIN;
 //let PASSWORD_ADMIN = process.env.PASSWORD_ADMIN;
 
-const EMAIL_USER = "IT325project@gmail.com";
+const EMAIL_USER = "it325project@gmail.com";
 const EMAIL_PASS = "IT325project@Yacine";
 
 const bcrypt = require('bcrypt');
@@ -20,7 +20,10 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: false }))
+
+const { google } = require('googleapis');
+const OAuth2 = google.auth.OAuth2;
 
 //Verify token function for employee login
 function verifyToken(req, res, next) {
@@ -321,57 +324,65 @@ app.post('/set-password', (req, res) => {
 
 //employee log-in, token, edit personal information & notification email
 // login endpoint
-//employee log-in, token, edit personal information & notification email
-// login endpoint
 app.post('/login', (req, res) => {
   const email = req.body.email;
   const plainPassword = req.body.password;
 
   mysqlConnection.query(`SELECT EmpID, password FROM employee WHERE email = '${email}'`, (error, results) => {
-    if (error) {
+  if (error) {
       console.error(error);
       res.status(500).send(error);
-    } else if (results.length > 0) {
+  } else if (results.length > 0) {
       const hashedPassword = results[0].password;
       console.log(`Comparing plain password: ${plainPassword} with hashed password: ${hashedPassword}`);
       bcrypt.compare(plainPassword, hashedPassword, function(err, passwordMatch) {
-        if (passwordMatch) {
+      if (passwordMatch) {
           const EmpID = results[0].EmpID;
           const token = jwt.sign({EmpID: EmpID}, 'secretkey', { expiresIn: '24h' });
           console.log(`Creating token: ${token} for EmpID: ${EmpID}`);
-          // send notification email
-          let transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-              user: EMAIL_USER,
-              pass: EMAIL_PASS
-            }
-          });
-          let mailOptions = {
-            from: EMAIL_USER,
-            to: email,
-            subject: 'Successful login',
-            text: 'You have successfully logged in to your account.'
-          };
-          transporter.sendMail(mailOptions, function(error, info){
-            if (error) {
-              console.error(error);
-              res.status(500).send(error);
-            } else {
-              console.log(`Sending email to: ${email} with options: ${mailOptions}`);
-              res.status(200).send({ auth: true, token: token });
-            }
-          });
-        } else {
-          console.log(`Invalid email or password for email: ${email}`);
-          res.status(401).send({ auth: false, message: 'Invalid email or password' });
-        }
-      });
+
+          // OAuth2 client
+          const oAuth2Client = new OAuth2(
+              '251057707769-p79a5scvrg3b51bidqfttq13barjhs97.apps.googleusercontent.com',
+              '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',
+              'http://localhost:3550/login'
+          );
+
+          // get the access token
+          oAuth2Client.getAccessToken().then((accessToken) => {
+              oAuth2Client.setCredentials(accessToken);
+
+              // send notification email
+              const gmail = google.gmail({ version: 'v1', auth: oAuth2Client });
+              const message =
+              {
+                to: email,
+                subject: 'Successful login',
+                text: 'You have successfully logged in to your account.'
+            };
+            gmail.users.messages.send({ userId: 'me', message }, (err, result) => {
+                if (err) {
+                    console.error(err);
+                    res.status(500).send(err);
+                } else {
+                    console.log(`Sending email to: ${email} with options: ${message}`);
+                    res.status(200).send({ auth: true, token: token });
+                }
+            });
+        }).catch((err) => {
+            console.error(err);
+            res.status(500).send(err);
+        });
     } else {
-      console.log(`Invalid email or password for email: ${email}`);
-      res.status(401).send({ auth: false, message: 'Invalid email or password' });
+        console.log(`Invalid email or password for email: ${email}`);
+        res.status(401).send({ auth: false, message: 'Invalid email or password' });
     }
-  });
+    });
+} else {
+    console.log(`Invalid email or password for email: ${email}`);
+    res.status(401).send({ auth: false, message: 'Invalid email or password' });
+}
+});
 });
 
 

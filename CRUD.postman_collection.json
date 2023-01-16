@@ -16,19 +16,24 @@
 							"    pm.response.to.have.status(200);",
 							"});",
 							"",
-							"const jsonResponse = pm.response.json();",
-							"pm.globals.set(\"AuthTokenVar\", jsonResponse.token);"
+							"let jsonData = JSON.parse(responseBody);",
+							"let accessToken = jsonData.access_token;",
+							"postman.setEnvironmentVariable(\"access_token\", accessToken);",
+							""
 						],
 						"type": "text/javascript"
 					}
 				}
 			],
+			"protocolProfileBehavior": {
+				"followOriginalHttpMethod": false
+			},
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"username\": \"yacine_montacer\",\n    \"password\": \"kScJM2Hf5_TV?hN-\"\n}",
+					"raw": "{\n\"username\": \"yacine_montacer\",\n\"password\": \"kScJM2Hf5_TV?hN-\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -36,14 +41,169 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/",
+					"raw": "http://localhost:3550/",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "3000",
+					"port": "3550",
 					"path": [
 						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "employee login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"login successful\", function(){",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"followOriginalHttpMethod": false
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\"email\": \"yacinemontacer@gmail.com\",\n\"password\": \"123456789\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3550/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3550",
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "set password",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"password reset successful\", function(){",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"followOriginalHttpMethod": false
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{AuthTokenVar}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\"EmpID\": 154,\n\"password\": \"123456789\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3550/set-password",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3550",
+					"path": [
+						"set-password"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "projects by department",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"projects by department successful\", function(){",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"followOriginalHttpMethod": false
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{AuthTokenVar}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\"dept_id\": 2\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3550/projects-by-dept",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3550",
+					"path": [
+						"projects-by-dept"
 					]
 				}
 			},
@@ -87,12 +247,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/employees",
+					"raw": "http://localhost:3550/employees",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "3000",
+					"port": "3550",
 					"path": [
 						"employees"
 					]
@@ -129,12 +289,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/employees/12",
+					"raw": "http://localhost:3550/employees/12",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "3000",
+					"port": "3550",
 					"path": [
 						"employees",
 						"12"
@@ -173,7 +333,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"EmpID\": 99,\n    \"Name\": \"Brad Schoenfeld\",\n    \"EmpCode\": 112,\n    \"Salary\": 64000\n}",
+					"raw": "{\n    \"EmpID\": 154,\n    \"FirstName\": \"Brad\",\n    \"LastName\": \"Schoenfeld\",\n    \"EmpCode\": 112,\n    \"Salary\": 64000,\n    \"DaysOff\": 0,\n    \"email\": \"yacinemontacer@gmail.com\",\n    \"phone\": \"+216 55 888 777\",\n    \"job_title\": \"project manager\",\n    \"dept_name\": \"IT\",\n    \"password\":\"12345\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -181,12 +341,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/employees",
+					"raw": "http://localhost:3550/employees",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "3000",
+					"port": "3550",
 					"path": [
 						"employees"
 					]
@@ -223,12 +383,12 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/employees/99",
+					"raw": "http://localhost:3550/employees/99",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "3000",
+					"port": "3550",
 					"path": [
 						"employees",
 						"99"
@@ -267,7 +427,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"EmpID\": 13,\n    \"Name\": \"Brad Schoenfeld\",\n    \"EmpCode\": 112,\n    \"Salary\": 64000\n}",
+					"raw": "{\n    \"EmpID\": 99,\n    \"FirstName\": \"Brad\",\n    \"LastName\": \"Schoenfeld\",\n    \"EmpCode\": 112,\n    \"Salary\": 64000,\n    \"DaysOff\": 0,\n    \"email\": \"brad@gmail.com\",\n    \"phone\": \"+216 55 888 777\",\n    \"job_title\": \"project manager\",\n    \"dept_name\": \"IT\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -275,14 +435,180 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/employees",
+					"raw": "http://localhost:3550/employees",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "3000",
+					"port": "3550",
 					"path": [
 						"employees"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Days Off",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Book days off\", function(){",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{AuthTokenVar}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"EmpID\": 14,\n   \"DaysOff\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3550/check-days-off",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3550",
+					"path": [
+						"check-days-off"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get supervisor",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Get supervisor Successful\", function(){",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{AuthTokenVar}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"EmpID\":18\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3550/employee-supervisor",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3550",
+					"path": [
+						"employee-supervisor"
+					],
+					"query": [
+						{
+							"key": "EmpID",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "employee self edit",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"editing successful\", function(){",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"EmpID\":10,\n    \"FirstName\":\"Johnson\",\n    \"LastName\":\"Felix\",\n    \"email\":\"johnson@xyz.com\",\n    \"phone\":\"+216 66 666 666\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3550/employee",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3550",
+					"path": [
+						"employee"
 					]
 				}
 			},
