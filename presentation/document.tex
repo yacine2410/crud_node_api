@@ -1,0 +1,145 @@
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND THEMES
+%----------------------------------------------------------------------------------------
+\documentclass[aspectratio=169,xcolor=dvipsnames]{beamer}
+\usetheme{SimplePlus}
+
+\usepackage{hyperref}
+\usepackage{graphicx} % Allows including images
+\usepackage{booktabs} % Allows the use of \toprule, \midrule and \bottomrule in tables
+
+%----------------------------------------------------------------------------------------
+%	TITLE PAGE
+%----------------------------------------------------------------------------------------
+
+\title[short title]{Human Resources Management Tool} % The short title appears at the bottom of every slide, the full title is only on the title page
+\subtitle{Presentation}
+
+\author {Yacine Montacer}
+
+\institute[NTU] % Your institution as it will appear on the bottom of every slide, may be shorthand to save space
+{
+	Department of Information Technology \\
+	Tunis Business School % Your institution for the title page
+}
+\begin{document}
+	
+	\begin{frame}
+		% Print the title page as the first slide
+		\titlepage
+	\end{frame}
+	
+	%------------------------------------------------
+	\section{First Section}
+	
+	%------------------------------------------------
+	
+	\begin{frame}{Introduction}
+		HR software is used to automate and streamline many of the tasks associated with human resources management, such as recruiting, onboarding, performance management, and employee benefits administration. It can help organizations of all sizes improve the efficiency and effectiveness of their HR functions, while also providing valuable data and insights that can inform strategic decision-making. 
+	\end{frame}
+	
+	%------------------------------------------------
+	\begin{frame}{Demo}
+		My project demo is a basic CRUD API backend built with Node.js and Express.js, it uses a MySQL database to manage employees, projects and departments. It also includes authentication and authorization functionality. It allows the user to perform various operations like employee login, token creation, editing personal information, and sending a notification email. The project also uses the bcrypt library for password hashing and salting and the JWT library for creating JSON web tokens for authentication. It also uses OAuth2 for authentication when sending the notification email.
+	\end{frame}
+	
+	
+	%------------------------------------------------
+	
+	\begin{frame}{Main Topics}
+		\begin{itemize}
+			\item Database structure
+			\item Access token, environment variables, encryption
+			\item CRUD operations
+			\item User log-in and interactivity
+			\item API testing using postman & development difficulties
+			\item Needed features
+		\end{itemize}
+	\end{frame}
+	
+	%------------------------------------------------
+	
+	\begin{frame}{Database Structure}
+		\begin{columns}[c] % The "c" option specifies centered vertical alignment while the "t" option is used for top vertical alignment
+			
+			\column{.45\textwidth} % Left column and width
+			\includegraphics[scale=0.5]{pics/employeeDB1.png}
+			\column{.5\textwidth} % Right column and width
+			The database structure for this project includes 3 main tables: employee, project, and department. The employee table contains information about each employee, including their Employee ID (EmpID), first name, last name, email, phone, and password. The project table contains information about each project, including the project's name, start date, end date, and the Employee ID of the project manager. The department table contains information about each department, including the department's name and the Employee ID of the department head.
+			
+		\end{columns}
+	\end{frame}
+	
+	%------------------------------------------------
+	
+	\begin{frame}{Access Token JWT}
+		\begin{columns}[c] % The "c" option specifies centered vertical alignment while the "t" option is used for top vertical alignment
+			
+			\column{.45\textwidth} % Left column and width
+			\textbf{Heading}
+			\begin{enumerate}
+				\item User Log-in
+				\item Server Creates JWT
+				\item User Request Access
+				\item Server Grants Access
+			\end{enumerate}
+			
+			\column{.5\textwidth} % Right column and width
+			The admin authenticated using a username - password combination, they are given a token that is generated
+			from a secret key, viable for 15 minutes. The token is sent along with any request to any
+			endpoint in the API. And the token can get refreshed every 10 minutes so the user doesn't have to log in again excessively.
+			
+		\end{columns}
+	\end{frame}
+	
+	\begin{frame}{Environment Variables}
+		I used environment variables for the log-in information for the admin and the email account. Environment variables are a way to store information that can be used by the operating system or applications running on the system. They are typically used to store sensitive information such as passwords, API keys, or other sensitive information that should not be stored in the codebase. These variables are stored in the operating system and can be accessed by applications running on the system. They are typically set up using the command line or a script, and are often stored in a configuration file or in the system registry. They can be read and modified by the application at runtime, without requiring a recompilation. This allows for easy and secure configuration of the application.
+	\end{frame}
+	
+	\begin{frame}{Hashing & Salting}
+		The passwords on the employee table are encrypting with hashing & salting, so that passwords are not stored anywhere in their normal format. Hashing is a one-way process of taking an input (or 'message') and returning a fixed-size string of characters, which is a 'digest' that is unique to the original input. The same input will always produce the same hash, but even a small change to the input will produce a very different hash. Hashing is often used to store passwords securely in a database as it's not possible to retrieve the original password from the hashed version.
+		
+		Salting is the process of adding random data to the input before it is hashed. This is done to make it more difficult for an attacker to use precomputed tables of hash values (often called rainbow tables) to determine the original input. It also prevents two users with the same password from having the same hash value in the database. Essentially, a salt is added to make the process of cracking a password more difficult
+	\end{frame}
+	%------------------------------------------------
+	
+	\begin{frame}{CRUD operations}
+		The Node back-end demo has operations to log users in, send them confirmation emails and allow them to modify their personal information. The admin logs in to access the 3 tables, book vacations for employees, and perform different operations
+		
+		\begin{block}{POST}
+			Log-in, employee log-in & email confirmation, display projects for each department, reset password and encrypt, insert employee
+		\end{block}
+		
+		\begin{block}{PUT}
+			Update employee data, employee editing personal data
+		\end{block}
+		
+		\begin{block}{GET}
+			Book vacation days, Retrieve employees, obtain supervisor information
+		\end{block}
+		
+		\begin{block}{DELETE}
+			Deleting employees
+		\end{block}
+	\end{frame}
+	
+	\begin{frame}{API Testing and difficulties}
+		I used Postman to test my API endpoints. The automated testing helped expedite the development process, and it brought light to certain difficulties, which were logging into Gmail to send the confirmation email and also using the environment variables which haven't worked so far  
+	\end{frame}
+	
+	\begin{frame}{Needed Features}
+		The HR platform needs a lot of features to be functional, like attendance and payroll management, budget and expense management, client interactions and customer support tickets, Recruitment and job posting management...etc. 
+	\end{frame}
+	
+	\section{Second Section}
+	%----------------------------------------------
+	
+	%------------------------------------------------
+	
+	\begin{frame}
+		\Huge{\centerline{\textbf{Thank You!}}}
+	\end{frame}
+	
+	%----------------------------------------------------------------------------------------
+	
+\end{document}
